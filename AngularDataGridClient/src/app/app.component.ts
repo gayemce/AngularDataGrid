@@ -2,13 +2,12 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { AgGridModule } from 'ag-grid-angular';
-import { HttpClient } from '@angular/common/http';
-import { ButtonRenderComponent } from './button-render/button-render.component';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, AgGridModule, ButtonRenderComponent],
+  imports: [CommonModule, RouterOutlet, AgGridModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
@@ -34,6 +33,13 @@ export class AppComponent {
     }
   ];
 
+  gridOptions: any = {
+    overlayLoadingTemplate:
+      `<span class="ag-overlay-loading-center">Yükleniyor...</span>`,
+    overlayNoRowsTemplate:
+      `<span style="padding: 10px;">No data available to display</span>`,
+  };
+
   autoSizeStrategy: any = {
     type: 'fitCellContents',
     defaultWidth: 100
@@ -45,21 +51,43 @@ export class AppComponent {
   // };
 
   defaultColDef: any = {
+    editable: this.checkAuthorization(),
     filter: true,
     defaultMinWidth: 300,
     floatingFilter: true,
+    onCellValueChanged: (params: any) => this.update(params)
   }
 
   constructor(private http: HttpClient) { }
 
   // Load data into grid when ready
   onGridReady(params: any) {
-    this.http.get("https://localhost:7204/api/Values/GetAll").subscribe(res => {
-      this.rowData = res;
-    })
+    params.api.showLoadingOverlay();
+    this.getAll(params);
   }
 
-  remove(id: any){
-    console.log(id)
+  checkAuthorization() {
+    return true;
   }
+
+  getAll(params: any = null) {
+    this.http.get("https://localhost:7204/api/Values/GetAll")
+      .subscribe({
+        next: (res: any) => {
+          this.rowData = res
+        },
+        error: (err: HttpErrorResponse) => {
+          params?.api?.showNoRowsOverlay();
+        }
+      })
+  }
+
+  update(params: any) {
+    console.log(params.data);
+    this.http.post("https://localhost:7204/api/Values/Update", params.data)
+      .subscribe(res => {
+        this.getAll();
+      })
+  }
+
 }

@@ -38,6 +38,14 @@ public class ValuesController(ApplicationDbContext context) : ControllerBase
         return Ok(books); 
         //AsQueryable database de ki tüm kaydı çekmek yerine verilen sorgularla son halini çeker.
     }
+
+    [HttpPost]
+    public IActionResult Update(Book book)
+    {
+        context.Update(book);
+        context.SaveChanges();
+        return NoContent();
+    }
 }
 
 public sealed class ApplicationDbContext : DbContext
