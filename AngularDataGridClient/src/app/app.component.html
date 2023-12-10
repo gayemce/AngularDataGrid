@@ -1,0 +1,10 @@
+<ag-grid-angular
+  class="ag-theme-quartz"
+  style="width: 100%; height: 97vh;"
+[rowData]="rowData"
+[columnDefs]="colDefs"
+[defaultColDef]="defaultColDef"
+[pagination]="true"
+[autoSizeStrategy]="autoSizeStrategy"
+(gridReady)="onGridReady($event)">
+</ag-grid-angular>
