@@ -4,8 +4,11 @@
 [rowData]="rowData"
 [gridOptions]="gridOptions"
 [columnDefs]="colDefs"
-[defaultColDef]="defaultColDef"
 [pagination]="true"
+[getContextMenuItems]="getContextMenuItems"
 [autoSizeStrategy]="autoSizeStrategy"
+[defaultColDef]="defaultColDef"
+[components]="frameworkComponents"
+(rowDoubleClicked)="onRowDoubleClicked($event)"
 (gridReady)="onGridReady($event)">
 </ag-grid-angular>

@@ -2,7 +2,10 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { AgGridModule } from 'ag-grid-angular';
+import { GetContextMenuItemsParams, MenuItemDef, ColDef } from 'ag-grid-community'
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { buttonRendererComponent } from './button-renderer.component';
+import 'ag-grid-enterprise'
 
 @Component({
   selector: 'app-root',
@@ -14,14 +17,21 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 export class AppComponent {
 
   rowData: any = [];
+  frameworkComponents: any;
 
-  colDefs: any[] = [
+  
+  constructor(private http: HttpClient) {
+    this.frameworkComponents = {
+      buttonRenderer: buttonRendererComponent
+    }
+   }
+
+  colDefs: ColDef[] = [
     {
       headerName: "#",
       valueGetter: (params: any) => params.node.rowIndex + 1,
       width: 30,
       floatingFilter: false,
-      sort: false
     },
     { field: "name" },
     { field: "summary" },
@@ -30,6 +40,14 @@ export class AppComponent {
       field: "publishDate", valueFormatter: (params: any) => {
         return new Date(params.value).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
       },
+    },
+    {
+      headerName: "Operations",
+      cellRenderer: "buttonRenderer",
+      cellRendererParams: {
+        onClick: this.remove.bind(this),
+        label: 'Remove'
+      }
     }
   ];
 
@@ -58,12 +76,38 @@ export class AppComponent {
     onCellValueChanged: (params: any) => this.update(params)
   }
 
-  constructor(private http: HttpClient) { }
-
   // Load data into grid when ready
   onGridReady(params: any) {
     params.api.showLoadingOverlay();
     this.getAll(params);
+  }
+
+  //Right Click
+  getContextMenuItems(params: GetContextMenuItemsParams): (string | MenuItemDef)[] {
+    var result: (string | MenuItemDef)[] = [
+      {
+        name: "Example Action",
+        action: () => {
+          console.log("Örnek aksiyon çalıştırıldı...");
+          console.log(params?.node?.data);
+        }
+      },
+      'copy',
+      'paste',
+      'seperator'
+    ]
+
+    return result;
+
+  }
+
+  // Double Click
+  onRowDoubleClicked(event: any){
+    console.log(event.data);
+  }
+
+  remove(event: any){
+    console.log(event.rowData);
   }
 
   checkAuthorization() {
