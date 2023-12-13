@@ -1,3 +1,13 @@
+<div class="example-header">
+  <span>Quick Filter:</span>
+  <input
+    type="text"
+    id="filter-text-box"
+    placeholder="Filter..."
+    (input)="onFilterTextBoxChanged()"
+  />
+</div>
+
 <ag-grid-angular
   class="ag-theme-quartz"
   style="width: 100%; height: 97vh;"
@@ -5,10 +15,17 @@
 [gridOptions]="gridOptions"
 [columnDefs]="colDefs"
 [pagination]="true"
+[sideBar]="true"
 [getContextMenuItems]="getContextMenuItems"
 [autoSizeStrategy]="autoSizeStrategy"
 [defaultColDef]="defaultColDef"
 [components]="frameworkComponents"
+[rowModelType]="rowModelType"
 (rowDoubleClicked)="onRowDoubleClicked($event)"
 (gridReady)="onGridReady($event)">
 </ag-grid-angular>
+
+<br>
+<br>
+
+<app-server-side></app-server-side>

@@ -5,7 +5,7 @@ Accept: application/json
 
 ###
 
-GET {{AngularDataGridServer_HostAddress}}/api/Values/GetAll?top=2&orderby=name
+GET {{AngularDataGridServer_HostAddress}}/api/Values/GetAll?skip=0&top=100
 Accept: application/json
 
 ###

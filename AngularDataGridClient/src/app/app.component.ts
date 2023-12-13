@@ -6,11 +6,13 @@ import { GetContextMenuItemsParams, MenuItemDef, ColDef } from 'ag-grid-communit
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { buttonRendererComponent } from './button-renderer.component';
 import 'ag-grid-enterprise'
+import { GridApi, RowModelType } from 'ag-grid-enterprise';
+import { ServerSideComponent } from './server-side/server-side.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, AgGridModule],
+  imports: [CommonModule, RouterOutlet, AgGridModule, ServerSideComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
@@ -18,13 +20,14 @@ export class AppComponent {
 
   rowData: any = [];
   frameworkComponents: any;
+  gridApi: any;
+  rowModelType: RowModelType | undefined = "serverSide";
 
-  
   constructor(private http: HttpClient) {
     this.frameworkComponents = {
       buttonRenderer: buttonRendererComponent
     }
-   }
+  }
 
   colDefs: ColDef[] = [
     {
@@ -78,6 +81,7 @@ export class AppComponent {
 
   // Load data into grid when ready
   onGridReady(params: any) {
+    this.gridApi = params.api;
     params.api.showLoadingOverlay();
     this.getAll(params);
   }
@@ -92,6 +96,19 @@ export class AppComponent {
           console.log(params?.node?.data);
         }
       },
+      {
+        icon: `<i class="fa-solid fa-download"></i>`,
+        name: "Example Export",
+        subMenu: [
+          {
+            name: 'Excel Export',
+            action: () => {
+              params.api.exportDataAsExcel();
+            }
+          }
+        ]
+
+      },
       'copy',
       'paste',
       'seperator'
@@ -101,12 +118,19 @@ export class AppComponent {
 
   }
 
+    onFilterTextBoxChanged() {
+    this.gridApi.setGridOption(
+      'quickFilterText',
+      (document.getElementById('filter-text-box') as HTMLInputElement).value
+    );
+  }
+
   // Double Click
-  onRowDoubleClicked(event: any){
+  onRowDoubleClicked(event: any) {
     console.log(event.data);
   }
 
-  remove(event: any){
+  remove(event: any) {
     console.log(event.rowData);
   }
 

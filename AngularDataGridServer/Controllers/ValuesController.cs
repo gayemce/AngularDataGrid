@@ -9,6 +9,8 @@ namespace AngularDataGridServer.Controllers;
 [ApiController]
 public class ValuesController(ApplicationDbContext context) : ControllerBase
 {
+    private static List<Book> Books = new();
+
     [HttpGet]
     public IActionResult SeedData()
     {
@@ -23,8 +25,9 @@ public class ValuesController(ApplicationDbContext context) : ControllerBase
                 Summary = faker.Lorem.Lines(2),
             };
 
-            context.Add(book);
-            context.SaveChanges();
+            Books.Add(book);
+            //context.Add(book);
+            //context.SaveChanges();
         }
 
         return NoContent();
@@ -34,8 +37,9 @@ public class ValuesController(ApplicationDbContext context) : ControllerBase
     [EnableQuery]
     public IActionResult GetAll()
     {
-        var books = context.Books.AsQueryable();
-        return Ok(books); 
+        //var books = context.Books.AsQueryable();
+
+        return Ok(Books);
         //AsQueryable database de ki tüm kaydı çekmek yerine verilen sorgularla son halini çeker.
     }
 
@@ -58,6 +62,13 @@ public sealed class ApplicationDbContext : DbContext
     }
 
     public DbSet<Book> Books { get; set; }
+}
+
+public sealed record PaginationResponse<T>
+    where T : class
+{
+    public T? Data { get; init; }
+    public int TotalCount { get; init; }
 }
 
 public sealed class Book
